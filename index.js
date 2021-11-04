@@ -57,26 +57,19 @@ const findNonASCIIInFile = async (inputFile) => {
   }
 
   const output = [];
-  //const regex = new RegExp('[^\x00-\x7f]');
-  //const regex = new RegExp('[\u202a\u202b\u200e]');
-  
+
   const fileStream = fs.createReadStream(inputFile);
 
   const rl = readline.createInterface({
     input: fileStream,
     crlfDelay: Infinity
   });
-  // Note: we use the crlfDelay option to recognize all instances of CR LF
-  // ('\r\n') in input.txt as a single line break.
+
   let lineNumber = 0;
   for await (const line of rl) {
-    lineNumber++;
-    // Each line in input.txt will be successively available here as `line`.
-    //console.log(`Line from file: ${line}`);
+    lineNumber++;   
     const match = bidiRegex.exec(line);
-
     if (match) {
-      //console.log(' = ' + match.index); 
       output.push({ line: lineNumber, col: match.index });
     }
   }
