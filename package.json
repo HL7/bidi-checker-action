@@ -1,0 +1,24 @@
+{
+  "name": "bidi-checker-action",
+  "version": "1.0.0",
+  "description": "A GitHub action that checks for bi-directional unicode characters.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HL7/bidi-checker-action.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HL7/bidi-checker-action/issues"
+  },
+  "homepage": "https://github.com/HL7/bidi-checker-action#readme",
+  "dependencies": {
+    "@actions/core": "^1.6.0",
+    "@actions/github": "^5.0.0"
+  }
+}
