@@ -4,7 +4,7 @@ const path = require('path')
 const fs = require('fs');
 const readline = require('readline');
 
-const findNonASCIIInDirectory = async (inputDirectory) => {
+const findBidiCharactersInDirectory = async (inputDirectory) => {
   let failedFiles = 0;
 
   const files = fs.readdirSync(inputDirectory);
@@ -17,12 +17,11 @@ const findNonASCIIInDirectory = async (inputDirectory) => {
     const filePath = inputDirectory + path.sep + file
     const lstat = fs.lstatSync(filePath);
     if (lstat.isDirectory()) {
-      console.log(`directory ${filePath}`);
-      findNonASCIIInDirectory(filePath);
+      failedFiles += await findBidiCharactersInDirectory(filePath);
     } else if (lstat.isFile()) {
-      const fileResult = await findNonASCIIInFile(filePath, 'utf-8')
+      const fileResult = await findBidiCharactersInFile(filePath, 'utf-8')
       if (fileResult.length > 0) {
-        console.log(`Non-ASCII characters found in file: ${filePath}`);
+        console.log(`${filePath} contains bidi characters.`);
         for (const resultLine of fileResult) {
           console.log(`   ${resultLine.line}:${resultLine.col}`);
         }
@@ -51,7 +50,7 @@ const BIDI_CHARS = [
 
 const bidiRegex = new RegExp(`[${BIDI_CHARS.join("")}]`);
 
-const findNonASCIIInFile = async (inputFile) => {
+const findBidiCharactersInFile = async (inputFile) => {
   if (!fs.lstatSync(inputFile).isFile()) {
     throw new Error('Input is not a file');
   }
@@ -86,9 +85,10 @@ try {
   const payload = JSON.stringify(github.context.payload, undefined, 2)
   console.log(`The event payload: ${payload}`);
 
-  const success = findNonASCIIInDirectory('/your/directory/here');
+  const success = findBidiCharactersInDirectory('/your/directory/here');
 
   success.then(failures => {
+  
     if (failures == 0) {
       console.log('CHECK PASSED');
     } else {
