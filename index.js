@@ -76,7 +76,8 @@ const findBidiCharactersInFile = async (inputFile) => {
 }
 
 try {
-  const fullPath = path.resolve('.');
+  console.log('GITHUB_WORKSPACE=' + process.env.GITHUB_WORKSPACE);
+  const fullPath = path.resolve(process.env.GITHUB_WORKSPACE);
   console.log('Executing in ' + fullPath);
 
   fs.readdirSync(fullPath).forEach(file => {
@@ -92,7 +93,7 @@ try {
   const payload = JSON.stringify(github.context.payload, undefined, 2)
   console.log(`The event payload: ${payload}`);
 
-  const success = findBidiCharactersInDirectory('.');
+  const success = findBidiCharactersInDirectory(fullPath);
 
   success.then(failures => {
   
