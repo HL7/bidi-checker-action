@@ -84,9 +84,9 @@ try {
   const fullPath = path.resolve(process.env.GITHUB_WORKSPACE);
   console.log('Executing in ' + fullPath);
 
-  fs.readdirSync(fullPath).forEach(file => {
-    console.log(' ' + file);
-  });
+  if (fs.readdirSync(fullPath).length == 0) {
+    throw new Error('GITHUB_WORKSPACE is empty. Please include an actions/checkout action in your steps to populate this directory.');
+  }
 
   const time = (new Date()).toTimeString();
   core.setOutput("time", time);
