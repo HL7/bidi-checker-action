@@ -100,11 +100,9 @@ try {
     } else {
       const error = `CHECK FAILED: ${failures} files found with non-ascii characters.`;
       console.log(error);
-      throw new Error(error + ' Check log for details.');
+      core.setFailed(error + ' Check log for details.');
     }
-  }).catch(error => {
-    throw error
-  });
+  })
 
 } catch (error) {
   core.setFailed(error.message);
