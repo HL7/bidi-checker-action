@@ -76,7 +76,11 @@ const findBidiCharactersInFile = async (inputFile) => {
 }
 
 try {
-  console.log('GITHUB_WORKSPACE=' + process.env.GITHUB_WORKSPACE);
+  // Get the JSON webhook payload for the event that triggered the workflow
+  const payload = JSON.stringify(github.context.payload, undefined, 2)
+  console.log(`github.context.payload: ${payload}`);
+  console.log('');
+
   const fullPath = path.resolve(process.env.GITHUB_WORKSPACE);
   console.log('Executing in ' + fullPath);
 
@@ -84,15 +88,9 @@ try {
     console.log(' ' + file);
   });
 
-  // `who-to-greet` input defined in action metadata file
-  const nameToGreet = core.getInput('who-to-greet');
-  console.log(`Hello ${nameToGreet}!`);
   const time = (new Date()).toTimeString();
   core.setOutput("time", time);
-  // Get the JSON webhook payload for the event that triggered the workflow
-  const payload = JSON.stringify(github.context.payload, undefined, 2)
-  console.log(`The event payload: ${payload}`);
-
+  
   const success = findBidiCharactersInDirectory(fullPath);
 
   success.then(failures => {
