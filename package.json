@@ -1,6 +1,6 @@
 {
   "name": "bidi-checker-action",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "A GitHub action that checks for bi-directional unicode characters.",
   "main": "index.js",
   "scripts": {
