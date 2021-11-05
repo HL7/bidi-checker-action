@@ -76,6 +76,13 @@ const findBidiCharactersInFile = async (inputFile) => {
 }
 
 try {
+  const fullPath = path.resolve('.');
+  console.log('Executing in ' + fullPath);
+
+  fs.readdirSync(fullPath).forEach(file => {
+    console.log(' ' + file);
+  });
+
   // `who-to-greet` input defined in action metadata file
   const nameToGreet = core.getInput('who-to-greet');
   console.log(`Hello ${nameToGreet}!`);
@@ -85,7 +92,7 @@ try {
   const payload = JSON.stringify(github.context.payload, undefined, 2)
   console.log(`The event payload: ${payload}`);
 
-  const success = findBidiCharactersInDirectory('/your/directory/here');
+  const success = findBidiCharactersInDirectory('.');
 
   success.then(failures => {
   
