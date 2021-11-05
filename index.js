@@ -102,6 +102,8 @@ try {
       console.log(error);
       throw new Error(error + ' Check log for details.');
     }
+  }).catch(error => {
+    throw error
   });
 
 } catch (error) {
