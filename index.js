@@ -3,6 +3,8 @@ const github = require('@actions/github');
 const path = require('path')
 const fs = require('fs');
 const readline = require('readline');
+const { start } = require('repl');
+const { context } = require('@actions/github/lib/utils');
 
 const findBidiCharactersInDirectory = async (inputDirectory) => {
   let failedFiles = 0;
@@ -76,6 +78,8 @@ const findBidiCharactersInFile = async (inputFile) => {
 }
 
 try {
+  const startTime = (new Date()).getTime();
+  
   // Get the JSON webhook payload for the event that triggered the workflow
   const payload = JSON.stringify(github.context.payload, undefined, 2)
   console.log(`github.context.payload: ${payload}`);
@@ -88,13 +92,13 @@ try {
     throw new Error('GITHUB_WORKSPACE is empty. Please include an actions/checkout action in your steps to populate this directory.');
   }
 
-  const time = (new Date()).toTimeString();
-  core.setOutput("time", time);
-  
   const success = findBidiCharactersInDirectory(fullPath);
 
   success.then(failures => {
-  
+    const endTime = (new Date()).getTime();
+    const runTime = new Date(endTime - startTime);
+
+    core.setOutput("time", runTime.toTimeString());
     if (failures == 0) {
       console.log('CHECK PASSED');
     } else {
