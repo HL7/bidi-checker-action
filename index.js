@@ -4,6 +4,23 @@ const path = require('path')
 const fs = require('fs');
 const readline = require('readline');
 
+const FILE_IGNORE_REGEX = [
+  '^\.git'
+]
+
+const ignorePath = (inputFile) => {
+  const fullPath = path.resolve(process.env.GITHUB_WORKSPACE);
+  const inputPath = path.resolve(inputFile);
+
+  const relativePath = path.relative(fullPath, inputPath);
+  for (regex of FILE_IGNORE_REGEX) {
+    if (new RegExp(regex).test(relativePath)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 const findBidiCharactersInDirectory = async (inputDirectory) => {
   let failedFiles = 0;
 
@@ -15,17 +32,23 @@ const findBidiCharactersInDirectory = async (inputDirectory) => {
 
   for (const file of files) {
     const filePath = inputDirectory + path.sep + file
-    const lstat = fs.lstatSync(filePath);
-    if (lstat.isDirectory()) {
-      failedFiles += await findBidiCharactersInDirectory(filePath);
-    } else if (lstat.isFile()) {
-      const fileResult = await findBidiCharactersInFile(filePath, 'utf-8')
-      if (fileResult.length > 0) {
-        console.log(`${filePath} contains bidi characters.`);
-        for (const resultLine of fileResult) {
-          console.log(`   ${resultLine.line}:${resultLine.col}`);
+    if (ignorePath(filePath)) {
+      console.log(`Ignoring path: ${filePath}`);
+    }
+    else
+    {
+      const lstat = fs.lstatSync(filePath);
+      if (lstat.isDirectory()) {
+        failedFiles += await findBidiCharactersInDirectory(filePath);
+      } else if (lstat.isFile()) {
+        const fileResult = await findBidiCharactersInFile(filePath, 'utf-8')
+        if (fileResult.length > 0) {
+          console.log(`${filePath} contains bidi characters.`);
+          for (const resultLine of fileResult) {
+            console.log(`   ${resultLine.line}:${resultLine.col}`);
+          }
+          failedFiles++;
         }
-        failedFiles++;
       }
     }
   }
@@ -66,7 +89,7 @@ const findBidiCharactersInFile = async (inputFile) => {
 
   let lineNumber = 0;
   for await (const line of rl) {
-    lineNumber++;   
+    lineNumber++;
     const match = bidiRegex.exec(line);
     if (match) {
       output.push({ line: lineNumber, col: match.index });
@@ -76,34 +99,35 @@ const findBidiCharactersInFile = async (inputFile) => {
 }
 
 try {
-  const fullPath = path.resolve('.');
-  console.log('Executing in ' + fullPath);
+  const startTime = (new Date()).getTime();
 
-  fs.readdirSync(fullPath).forEach(file => {
-    console.log(' ' + file);
-  });
-
-  // `who-to-greet` input defined in action metadata file
-  const nameToGreet = core.getInput('who-to-greet');
-  console.log(`Hello ${nameToGreet}!`);
-  const time = (new Date()).toTimeString();
-  core.setOutput("time", time);
   // Get the JSON webhook payload for the event that triggered the workflow
   const payload = JSON.stringify(github.context.payload, undefined, 2)
-  console.log(`The event payload: ${payload}`);
+  console.log(`github.context.payload: ${payload}`);
+  console.log('');
 
-  const success = findBidiCharactersInDirectory('.');
+  const workspacePath = path.resolve(process.env.GITHUB_WORKSPACE);
+  console.log('Executing in ' + workspacePath);
+
+  if (fs.readdirSync(workspacePath).length == 0) {
+    throw new Error('GITHUB_WORKSPACE is empty. Please include an actions/checkout action in your steps to populate this directory.');
+  }
+
+  const success = findBidiCharactersInDirectory(workspacePath);
 
   success.then(failures => {
-  
+    const endTime = (new Date()).getTime();
+    const runTime = endTime - startTime;
+
+    core.setOutput("time", `${runTime}ms` );
     if (failures == 0) {
       console.log('CHECK PASSED');
     } else {
       const error = `CHECK FAILED: ${failures} files found with non-ascii characters.`;
       console.log(error);
-      throw new Error(error + ' Check log for details.');
+      core.setFailed(error + ' Check log for details.');
     }
-  });
+  })
 
 } catch (error) {
   core.setFailed(error.message);
