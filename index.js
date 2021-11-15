@@ -98,37 +98,43 @@ const findBidiCharactersInFile = async (inputFile) => {
   return output;
 }
 
-try {
-  const startTime = (new Date()).getTime();
 
-  // Get the JSON webhook payload for the event that triggered the workflow
-  const payload = JSON.stringify(github.context.payload, undefined, 2)
-  console.log(`github.context.payload: ${payload}`);
-  console.log('');
-
-  const workspacePath = path.resolve(process.env.GITHUB_WORKSPACE);
-  console.log('Executing in ' + workspacePath);
-
-  if (fs.readdirSync(workspacePath).length == 0) {
-    throw new Error('GITHUB_WORKSPACE is empty. Please include an actions/checkout action in your steps to populate this directory.');
-  }
-
-  const success = findBidiCharactersInDirectory(workspacePath);
-
-  success.then(failures => {
-    const endTime = (new Date()).getTime();
-    const runTime = endTime - startTime;
-
-    core.setOutput("time", `${runTime}ms` );
-    if (failures == 0) {
-      console.log('CHECK PASSED');
-    } else {
-      const error = `CHECK FAILED: ${failures} files found with non-ascii characters.`;
-      console.log(error);
-      core.setFailed(error + ' Check log for details.');
+// most @actions toolkit packages have async methods
+async function run() {
+  try {
+    const startTime = (new Date()).getTime();
+  
+    // Get the JSON webhook payload for the event that triggered the workflow
+    const payload = JSON.stringify(github.context.payload, undefined, 2)
+    console.log(`github.context.payload: ${payload}`);
+    console.log('');
+  
+    const workspacePath = path.resolve(process.env.GITHUB_WORKSPACE);
+    console.log('Executing in ' + workspacePath);
+  
+    if (fs.readdirSync(workspacePath).length == 0) {
+      throw new Error('GITHUB_WORKSPACE is empty. Please include an actions/checkout action in your steps to populate this directory.');
     }
-  })
-
-} catch (error) {
-  core.setFailed(error.message);
+  
+    const success = findBidiCharactersInDirectory(workspacePath);
+  
+    success.then(failures => {
+      const endTime = (new Date()).getTime();
+      const runTime = endTime - startTime;
+  
+      core.setOutput("time", `${runTime}ms` );
+      if (failures == 0) {
+        console.log('CHECK PASSED');
+      } else {
+        const error = `CHECK FAILED: ${failures} files found with non-ascii characters.`;
+        console.log(error);
+        core.setFailed(error + ' Check log for details.');
+      }
+    })
+  
+  } catch (error) {
+    core.setFailed(error.message);
+  }
 }
+
+run();

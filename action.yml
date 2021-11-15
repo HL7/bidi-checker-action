@@ -1,13 +1,10 @@
-name: 'Hello World'
-description: 'Greet someone and record the time'
+name: 'Bidi Character Checker'
+description: 'Check a repository for Bidirectional Unicode Characters'
 inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
-    required: true
-    default: 'World'
+  # Insert new inputs here
 outputs:
-  time: # id of output
-    description: 'The time we greeted you'
+  time: # execution time
+    description: 'Time required to check repository'
 runs:
   using: 'node12'
-  main: 'index.js'
+  main: 'dist/index.js'
