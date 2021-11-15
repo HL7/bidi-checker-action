@@ -4,7 +4,7 @@ A GitHub action that checks for bi-directional unicode characters.
 
 ---
 
-## Usage
+## Summary
 
 This action recursively checks the contents of the target repository for [Unicode Bidi characters](https://unicode.org/reports/tr9/), and reports a successful run if none are present.
 
@@ -23,9 +23,74 @@ The checker will ignore the contents of generated .git directories.
 
 The time in ms required to scan the repository.
 
-## Example usage
+## Building
 
-Include the following yml configutation in your `.github/workflows` directory. 
+Install the dependencies
+
+```bash
+npm install
+```
+
+Run the tests :heavy_check_mark:
+
+```bash
+$ npm test
+
+ ...
+
+ PASS  ./index.test.js
+  ✓ test valid-project (449 ms)
+  ✓ test invalid-project (84 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       2 passed, 2 total
+Snapshots:   0 total
+Time:        1.76 s
+Ran all test suites.
+...
+```
+
+
+## Package for distribution
+
+GitHub Actions will run the entry point from the action.yml. Packaging assembles the code into one file that can be checked in to Git, enabling fast and reliable execution and preventing the need to check in node_modules.
+
+Actions are run from GitHub repos.  Packaging the action will create a packaged action in the dist folder.
+
+Run prepare
+
+```bash
+npm run prepare
+```
+
+Since the packaged index.js is run from the dist folder.
+
+```bash
+git add dist
+```
+
+## Create a release branch
+
+Users shouldn't consume the action from master since that would be latest code and actions can break compatibility between major versions.
+
+Checkin to the v1 release branch
+
+```bash
+git checkout -b v1
+git commit -a -m "v1 release"
+```
+
+```bash
+git push origin v1
+```
+
+Your action is now published! :rocket:
+
+See the [versioning documentation](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md)
+
+## Usage
+
+You can now consume the action by including the following yml configutation in the `.github/workflows` directory of your project.
   
 ```yaml
 # Bidi Checker Action
@@ -55,10 +120,12 @@ jobs:
       # Run the check for bidi characters.
       - name: Check for bidi characters
         id: bidi_check
-        uses: HL7/bidi-checker-action@v1.3
+        uses: HL7/bidi-checker-action@v1.4
         with: # Placeholder for input parameters
       # Report check runtime in ms
       - name: Get the output time
         run: echo "The time was ${{ steps.bidi_check.outputs.time }}"
 
   ```
+
+See the [actions tab](https://github.com/actions/javascript-action/actions) for runs of this action! :rocket:
