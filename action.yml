@@ -1,7 +1,6 @@
 name: 'Bidi Character Checker'
 description: 'Check a repository for Bidirectional Unicode Characters'
-inputs:
-  # Insert new inputs here
+
 outputs:
   time: # execution time
     description: 'Time required to check repository'
