@@ -104,11 +104,6 @@ async function run() {
   try {
     const startTime = (new Date()).getTime();
   
-    // Get the JSON webhook payload for the event that triggered the workflow
-    const payload = JSON.stringify(github.context.payload, undefined, 2)
-    console.log(`github.context.payload: ${payload}`);
-    console.log('');
-  
     const workspacePath = path.resolve(process.env.GITHUB_WORKSPACE);
     console.log('Executing in ' + workspacePath);
   
@@ -126,7 +121,7 @@ async function run() {
       if (failures == 0) {
         console.log('CHECK PASSED');
       } else {
-        const error = `CHECK FAILED: ${failures} files found with non-ascii characters.`;
+        const error = `CHECK FAILED: ${failures} files found with bidi characters.`;
         console.log(error);
         core.setFailed(error + ' Check log for details.');
       }
