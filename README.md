@@ -120,7 +120,7 @@ jobs:
       # Run the check for bidi characters.
       - name: Check for bidi characters
         id: bidi_check
-        uses: HL7/bidi-checker-action@v1.4
+        uses: HL7/bidi-checker-action@v1.5
       # Report check runtime in ms
       - name: Get the output time
         run: echo "The time was ${{ steps.bidi_check.outputs.time }}"
