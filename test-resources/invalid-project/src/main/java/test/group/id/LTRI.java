@@ -1,10 +1,10 @@
 package test.group.id;
 
 /**
- * ‎
+ * ⁦
  * Bidi characters above
  */
-public class LRM
+public class LTRI
 {
     public static void main( String[] args )
     {
