@@ -8,12 +8,17 @@ const FILE_IGNORE_REGEX = [
   '^\.git'
 ]
 
+const CONFIGURED_IGNORE_REGEX = process.env.IGNORE
+
 const ignorePath = (inputFile) => {
   const fullPath = path.resolve(process.env.GITHUB_WORKSPACE);
   const inputPath = path.resolve(inputFile);
 
   const relativePath = path.relative(fullPath, inputPath);
-  for (regex of FILE_IGNORE_REGEX) {
+
+  const ignoreExpressions = FILE_IGNORE_REGEX.concat([CONFIGURED_IGNORE_REGEX])
+
+  for (regex of ignoreExpressions) {
     if (new RegExp(regex).test(relativePath)) {
       return true;
     }
