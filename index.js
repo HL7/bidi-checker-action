@@ -10,13 +10,24 @@ const FILE_IGNORE_REGEX = [
 
 const CONFIGURED_IGNORE_REGEX = process.env.IGNORE
 
+/** 
+ * Only checks that the input is non-empty string
+*/
+const isValidConfigRegex = (input) => {
+  return input !== undefined
+    && input !== null
+    && input.trim().length > 0
+}
+
 const ignorePath = (inputFile) => {
   const fullPath = path.resolve(process.env.GITHUB_WORKSPACE);
   const inputPath = path.resolve(inputFile);
 
   const relativePath = path.relative(fullPath, inputPath);
 
-  const ignoreExpressions = FILE_IGNORE_REGEX.concat([CONFIGURED_IGNORE_REGEX])
+  const ignoreExpressions = isValidConfigRegex(CONFIGURED_IGNORE_REGEX)
+    ? FILE_IGNORE_REGEX.concat([CONFIGURED_IGNORE_REGEX]) 
+    : FILE_IGNORE_REGEX
 
   for (regex of ignoreExpressions) {
     if (new RegExp(regex).test(relativePath)) {
