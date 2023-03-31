@@ -5,5 +5,5 @@ outputs:
   time: # execution time
     description: 'Time required to check repository'
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'dist/index.js'
